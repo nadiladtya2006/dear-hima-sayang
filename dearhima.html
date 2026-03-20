@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebooks - Jurnal Pribadi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050507;
+            --bg-card: rgba(15, 15, 20, 0.7);
+            --fg: #e8e6e3;
+            --muted: #8a8a9a;
+            --accent: #d4af37; /* Gold */
+            --accent-glow: rgba(212, 175, 55, 0.2);
+            --border: rgba(255, 255, 255, 0.08);
+            --aurora-1: rgba(138, 43, 226, 0.15); /* Purple */
+            --aurora-2: rgba(75, 0, 130, 0.1); /* Indigo */
+            --aurora-3: rgba(186, 85, 211, 0.1); /* MediumOrchid */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Aurora Background Animation */
+        #aurora-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float-aurora 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .blob-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--aurora-1), transparent);
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .blob-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--aurora-2), transparent);
+            top: 30%;
+            right: -150px;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, var(--aurora-3), transparent);
+            bottom: -200px;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float-aurora {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33% { transform: translate(50px, -50px) scale(1.1) rotate(10deg); }
+            66% { transform: translate(-20px, 20px) scale(0.9) rotate(-5deg); }
+            100% { transform: translate(30px, 40px) scale(1.05) rotate(5deg); }
+        }
+
+        /* Starfield */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--muted);
+            border-radius: 10px;
+        }
+
+        /* Input Styles */
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: var(--fg);
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(138, 43, 226, 0.5);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #b8962d 100%);
+            color: var(--bg);
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Note Card */
+        .note-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .note-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(138, 43, 226, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .note-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+
+        /* Date Badge */
+        .date-badge {
+            background: rgba(138, 43, 226, 0.15);
+            color: #d8b4fe;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Image Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .upload-area:hover {
+            border-color: rgba(138, 43, 226, 0.5);
+            background: rgba(138, 43, 226, 0.05);
+        }
+
+        .image-preview-container {
+            position: relative;
+            width: 100%;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .image-preview-container.active {
+            display: block;
+        }
+
+        .image-preview-container img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .aurora-blob {
+                filter: blur(60px);
+                opacity: 0.4;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora Background -->
+    <div id="aurora-container">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
+    <!-- Starfield -->
+    <div id="starfield"></div>
+
+    <!-- Main App -->
+    <div id="app" class="relative z-10 min-h-screen">
+        
+        <!-- Login Screen -->
+        <div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
+            <div class="glass-card p-10 w-full max-w-md fade-in-up">
+                <div class="text-center mb-10">
+                    <h1 class="font-display text-5xl font-bold tracking-tight mb-3">Notebooks</h1>
+                    <div class="w-16 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto mb-3"></div>
+                    <p class="text-gray-400 text-sm">Catatan pribadi yang privat dan bermakna</p>
+                </div>
+
+                <div class="flex gap-2 mb-8 p-1 bg-black/40 rounded-2xl">
+                    <button class="tab-btn active flex-1" data-tab="owner" onclick="switchTab('owner')">Owner</button>
+                    <button class="tab-btn flex-1" data-tab="guest" onclick="switchTab('guest')">Teman</button>
+                </div>
+
+                <!-- Owner Login -->
+                <div id="ownerForm" class="space-y-5">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Username</label>
+                        <input type="text" id="username" class="input-field" placeholder="Masukkan username">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Password</label>
+                        <input type="password" id="password" class="input-field" placeholder="Masukkan password">
+                    </div>
+                    <button type="button" class="btn-primary w-full mt-6" onclick="handleOwnerLogin()">
+                        Masuk
+                    </button>
+                    <p id="loginError" class="text-red-400 text-sm text-center hidden">Username atau password salah</p>
+                </div>
+
+                <!-- Guest Access -->
+                <div id="guestForm" class="space-y-5 hidden">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Kode Akses</label>
+                        <input type="text" id="accessCode" class="input-field" placeholder="Masukkan kode berbagi">
+                    </div>
+                    <button type="button" class="btn-primary w-full mt-6" onclick="handleGuestAccess()">
+                        Akses Catatan
+                    </button>
+                    <p id="guestError" class="text-red-400 text-sm text-center hidden">Kode akses tidak valid</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard" class="hidden">
+            <!-- Header -->
+            <header class="border-b border-white/5 backdrop-blur-xl sticky top-0 z-50 bg-black/30">
+                <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <h1 class="font-display text-3xl font-bold">Notebooks</h1>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <span id="userBadge" class="date-badge hidden md:block"></span>
+                        <button id="logoutBtn" class="btn-secondary text-sm py-2 px-4" onclick="handleLogout()">
+                            Keluar
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="max-w-6xl mx-auto px-6 py-12">
+                <!-- Welcome Section -->
+                <div class="mb-12 fade-in-up">
+                    <h2 class="font-display text-5xl md:text-6xl font-bold mb-4 leading-tight">
+                        <span id="greeting">Selamat Datang</span>
+                    </h2>
+                    <p class="text-gray-400 text-lg">Ruang untuk menulis dan menyimpan momen berharga</p>
+                </div>
+
+                <!-- Action Buttons (Owner Only) -->
+                <div id="ownerActions" class="flex flex-wrap gap-4 mb-12 fade-in-up stagger-1">
+                    <button type="button" class="btn-primary flex items-center gap-2" onclick="openNewNoteModal()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tulis Catatan Baru
+                    </button>
+                    <button type="button" class="btn-secondary flex items-center gap-2" onclick="openShareModal()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        Bagikan
+                    </button>
+                    
+                    <!-- Export/Import Buttons -->
+                    <button type="button" class="btn-secondary flex items-center gap-2" onclick="exportData()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        Export Data
+                    </button>
+                    
+                    <label class="btn-secondary flex items-center gap-2 cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Import Data
+                        <input type="file" accept=".json" class="hidden" onchange="importData(event)">
+                    </label>
+                </div>
+
+                <!-- Notes Grid -->
+                <div class="mb-8 flex items-center justify-between fade-in-up stagger-3">
+                    <h3 class="font-display text-2xl font-semibold">Catatan Terbaru</h3>
+                    <select id="filterMonth" class="input-field w-auto text-sm py-2 px-4" onchange="filterNotes()">
+                        <option value="all">Semua Waktu</option>
+                    </select>
+                </div>
+
+                <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Notes will be rendered here -->
+                </div>
+
+                <div id="emptyState" class="hidden text-center py-24 fade-in-up">
+                    <div class="w-24 h-24 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-300 font-display text-2xl mb-2">Belum ada catatan</p>
+                    <p class="text-gray-500">Mulai tulis catatan pertamamu</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- New Note Modal -->
+    <div id="newNoteModal" class="modal-overlay" onclick="closeModal(event, 'newNoteModal')">
+        <div class="modal-content glass-card p-8 w-full max-w-2xl mx-4">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="font-display text-3xl font-semibold">Catatan Baru</h3>
+                <button type="button" onclick="closeModalById('newNoteModal')" class="text-gray-500 hover:text-white transition-colors p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Judul</label>
+                    <input type="text" id="noteTitle" class="input-field text-xl" placeholder="Judul catatan...">
+                </div>
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Tanggal</label>
+                    <input type="date" id="noteDate" class="input-field">
+                </div>
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Foto (Opsional)</label>
+                    <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                    <div id="uploadArea" class="upload-area" onclick="document.getElementById('imageInput').click()">
+                        <svg class="w-10 h-10 mx-auto mb-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <p class="text-gray-400 text-sm">Klik untuk menambahkan foto</p>
+                    </div>
+                    <div id="imagePreviewContainer" class="image-preview-container">
+                        <img id="imagePreview" src="" alt="Preview">
+                        <button type="button" class="remove-image-btn" onclick="removeImage()">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs text-gray-500 mb-2 uppercase tracking-wider">Isi Catatan</label>
+                    <textarea id="noteContent" class="input-field min-h-[200px]" placeholder="Tulis ceritamu di sini..."></textarea>
+                </div>
+                
+                <div class="flex gap-4 pt-4">
+                    <button type="button" class="btn-secondary flex-1" onclick="closeModalById('newNoteModal')">Batal</button>
+                    <button type="button" class="btn-primary flex-1" onclick="saveNote()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Note Modal -->
+    <div id="viewNoteModal" class="modal-overlay" onclick="closeModal(event, 'viewNoteModal')">
+        <div class="modal-content glass-card p-8 w-full max-w-2xl mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <span id="viewDate" class="date-badge"></span>
+                <button type="button" onclick="closeModalById('viewNoteModal')" class="text-gray-500 hover:text-white transition-colors p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="viewImageContainer" class="mb-6 hidden">
+                <img id="viewImage" src="" alt="" class="w-full max-h-[400px] object-cover rounded-2xl">
+            </div>
+            
+            <h3 id="viewTitle" class="font-display text-4xl font-bold mb-6"></h3>
+            <div id="viewContent" class="text-gray-300 leading-relaxed whitespace-pre-wrap text-lg"></div>
+            
+            <div id="viewActions" class="flex gap-4 pt-8 mt-8 border-t border-white/10">
+                <button type="button" class="btn-secondary flex-1" onclick="editCurrentNote()">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Edit
+                </button>
+                <button type="button" class="btn-secondary flex-1 text-red-400 hover:border-red-400" onclick="deleteCurrentNote()">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal-overlay" onclick="closeModal(event, 'shareModal')">
+        <div class="modal-content glass-card p-8 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-display text-2xl font-semibold">Bagikan dengan Teman</h3>
+                <button type="button" onclick="closeModalById('shareModal')" class="text-gray-500 hover:text-white transition-colors p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <p class="text-gray-400 mb-6">Berikan kode ini kepada teman untuk mengakses catatanmu:</p>
+            
+            <div class="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-6 text-center mb-6">
+                <p class="font-mono text-2xl text-purple-300 tracking-wider" id="shareCode">himasayang</p>
+            </div>
+            
+            <button type="button" class="btn-primary w-full" onclick="copyShareCode()">
+                Salin Kode
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 glass-card px-6 py-4 transform translate-x-[150%] transition-transform duration-500 z-[200] flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <span id="toastMessage">Berhasil disimpan</span>
+    </div>
+
+    <script>
+        // ============== KONFIGURASI ==============
+        const OWNER_CREDENTIALS = { username: 'Damar21', password: 'Damar.21' };
+        const FRIEND_ACCESS_CODE = 'himasayang';
+        const STORAGE_KEY = 'notebooks_data_v2';
+        
+        // ============== VARIABEL GLOBAL ==============
+        let currentUser = null;
+        let currentNoteId = null;
+        let currentImageData = null;
+        let notes = [];
+        
+        // ============== INISIALISASI ==============
+        function initializeData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const data = JSON.parse(stored);
+                    notes = data.notes || [];
+                } catch (e) {
+                    notes = [];
+                }
+            }
+            
+            if (notes.length === 0) {
+                notes = [
+                    {
+                        id: 'note_sample',
+                        title: 'Selamat Datang di Notebooks',
+                        content: 'Ini adalah catatan contoh. Anda bisa menambahkan foto dan teks ke dalam catatan. Jangan lupa export data untuk memindahkan ke perangkat lain.',
+                        date: new Date().toISOString().split('T')[0],
+                        image: null,
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                saveToStorage();
+            }
+        }
+        
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ notes }));
+        }
+
+        // ============== BACKGROUND EFFECTS ==============
+        function createStarfield() {
+            const container = document.getElementById('starfield');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const starCount = window.innerWidth < 768 ? 60 : 100;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 2 + 0.5;
+                
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (Math.random() * 4 + 2) + 's');
+                star.style.setProperty('--delay', (Math.random() * 3) + 's');
+                
+                container.appendChild(star);
+            }
+        }
+
+        // ============== AUTENTIKASI ==============
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(function(t) {
+                t.classList.remove('active');
+            });
+            document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+            
+            if (tab === 'owner') {
+                document.getElementById('ownerForm').classList.remove('hidden');
+                document.getElementById('guestForm').classList.add('hidden');
+            } else {
+                document.getElementById('ownerForm').classList.add('hidden');
+                document.getElementById('guestForm').classList.remove('hidden');
+            }
+        }
+
+        function handleOwnerLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+            
+            if (username === OWNER_CREDENTIALS.username && password === OWNER_CREDENTIALS.password) {
+                currentUser = { type: 'owner', username: username };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showDashboard();
+                errorEl.classList.add('hidden');
+            } else {
+                errorEl.classList.remove('hidden');
+                document.getElementById('password').value = '';
+            }
+        }
+
+        function handleGuestAccess() {
+            const code = document.getElementById('accessCode').value.trim();
+            const errorEl = document.getElementById('guestError');
+            
+            if (code === FRIEND_ACCESS_CODE) {
+                currentUser = { type: 'guest', username: 'Teman' };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showDashboard();
+                errorEl.classList.add('hidden');
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('accessCode').value = '';
+        }
+
+        // ============== DASHBOARD ==============
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            const ownerActions = document.getElementById('ownerActions');
+            
+            if (currentUser.type === 'owner') {
+                document.getElementById('userBadge').textContent = 'Owner';
+                ownerActions.style.display = 'flex';
+                
+                const hour = new Date().getHours();
+                let timeGreeting = 'Selamat Malam';
+                if (hour >= 5 && hour < 12) timeGreeting = 'Selamat Pagi';
+                else if (hour >= 12 && hour < 15) timeGreeting = 'Selamat Siang';
+                else if (hour >= 15 && hour < 18) timeGreeting = 'Selamat Sore';
+                
+                document.getElementById('greeting').textContent = timeGreeting + ', ' + currentUser.username;
+            } else {
+                document.getElementById('userBadge').textContent = 'Tamu';
+                ownerActions.style.display = 'none';
+                document.getElementById('greeting').textContent = 'Selamat Datang, Teman';
+            }
+            
+            renderNotes();
+            populateMonthFilter();
+        }
+
+        function renderNotes(filteredNotes) {
+            const grid = document.getElementById('notesGrid');
+            const emptyState = document.getElementById('emptyState');
+            const notesToRender = filteredNotes || notes;
+            
+            if (notesToRender.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            const sortedNotes = notesToRender.slice().sort(function(a, b) {
+                return new Date(b.date) - new Date(a.date);
+            });
+            
+            let html = '';
+            for (let i = 0; i < sortedNotes.length; i++) {
+                const note = sortedNotes[i];
+                const imageHtml = note.image ? 
+                    '<img src="' + note.image + '" alt="' + escapeHtml(note.title) + '">' : '';
+                const paddingClass = note.image ? 'p-5' : 'p-6';
+                
+                html += '<div class="note-card fade-in-up" style="animation-delay: ' + (i * 0.08) + 's" onclick="viewNote(\'' + note.id + '\')">' +
+                    imageHtml +
+                    '<div class="' + paddingClass + '">' +
+                        '<div class="flex items-center justify-between mb-3">' +
+                            '<span class="date-badge">' + formatDateShort(note.date) + '</span>' +
+                        '</div>' +
+                        '<h4 class="font-display text-xl font-semibold mb-2">' + escapeHtml(note.title) + '</h4>' +
+                        '<p class="text-gray-400 text-sm line-clamp-2">' + escapeHtml(note.content) + '</p>' +
+                    '</div>' +
+                '</div>';
+            }
+            
+            grid.innerHTML = html;
+        }
+
+        function populateMonthFilter() {
+            const select = document.getElementById('filterMonth');
+            const months = [];
+            
+            notes.forEach(function(n) {
+                const date = new Date(n.date);
+                const monthYear = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+                if (months.indexOf(monthYear) === -1) {
+                    months.push(monthYear);
+                }
+            });
+            
+            months.sort().reverse();
+            
+            let html = '<option value="all">Semua Waktu</option>';
+            for (let i = 0; i < months.length; i++) {
+                const m = months[i];
+                const parts = m.split('-');
+                const monthDate = new Date(parts[0], parts[1] - 1);
+                const monthName = monthDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+                html += '<option value="' + m + '">' + monthName + '</option>';
+            }
+            
+            select.innerHTML = html;
+        }
+
+        function filterNotes() {
+            const value = document.getElementById('filterMonth').value;
+            if (value === 'all') {
+                renderNotes();
+            } else {
+                const filtered = notes.filter(function(n) {
+                    return n.date.indexOf(value) === 0;
+                });
+                renderNotes(filtered);
+            }
+        }
+
+        // ============== IMAGE HANDLING ==============
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Ukuran foto maksimal 2MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    // Resize image to max 800px width
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxWidth = 800;
+                    
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = height * (maxWidth / width);
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    currentImageData = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    document.getElementById('imagePreview').src = currentImageData;
+                    document.getElementById('imagePreviewContainer').classList.add('active');
+                    document.getElementById('uploadArea').style.display = 'none';
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage() {
+            currentImageData = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreviewContainer').classList.remove('active');
+            document.getElementById('uploadArea').style.display = 'block';
+        }
+
+        // ============== NOTES CRUD ==============
+        function openNewNoteModal() {
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('noteDate').value = new Date().toISOString().split('T')[0];
+            currentNoteId = null;
+            currentImageData = null;
+            document.getElementById('imagePreviewContainer').classList.remove('active');
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('newNoteModal').classList.add('active');
+        }
+
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const date = document.getElementById('noteDate').value;
+            
+            if (!title || !content || !date) {
+                showToast('Mohon lengkapi judul dan isi catatan');
+                return;
+            }
+            
+            // If editing, remove old note
+            if (currentNoteId) {
+                notes = notes.filter(function(n) { return n.id !== currentNoteId; });
+            }
+            
+            const note = {
+                id: currentNoteId || 'note_' + Date.now(),
+                title: title,
+                content: content,
+                date: date,
+                image: currentImageData,
+                createdAt: new Date().toISOString()
+            };
+            
+            notes.push(note);
+            saveToStorage();
+            
+            closeModalById('newNoteModal');
+            renderNotes();
+            populateMonthFilter();
+            showToast('Catatan berhasil disimpan');
+        }
+
+        function viewNote(id) {
+            const note = notes.find(function(n) { return n.id === id; });
+            if (!note) return;
+            
+            currentNoteId = id;
+            
+            document.getElementById('viewTitle').textContent = note.title;
+            document.getElementById('viewDate').textContent = formatDate(note.date);
+            document.getElementById('viewContent').textContent = note.content;
+            
+            const imageContainer = document.getElementById('viewImageContainer');
+            const viewImage = document.getElementById('viewImage');
+            
+            if (note.image) {
+                viewImage.src = note.image;
+                imageContainer.classList.remove('hidden');
+            } else {
+                imageContainer.classList.add('hidden');
+            }
+            
+            document.getElementById('viewActions').style.display = currentUser && currentUser.type === 'owner' ? 'flex' : 'none';
+            document.getElementById('viewNoteModal').classList.add('active');
+        }
+
+        function editCurrentNote() {
+            const note = notes.find(function(n) { return n.id === currentNoteId; });
+            if (!note) return;
+            
+            closeModalById('viewNoteModal');
+            
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            document.getElementById('noteDate').value = note.date;
+            
+            if (note.image) {
+                currentImageData = note.image;
+                document.getElementById('imagePreview').src = note.image;
+                document.getElementById('imagePreviewContainer').classList.add('active');
+                document.getElementById('uploadArea').style.display = 'none';
+            } else {
+                currentImageData = null;
+                document.getElementById('imagePreviewContainer').classList.remove('active');
+                document.getElementById('uploadArea').style.display = 'block';
+            }
+            
+            document.getElementById('newNoteModal').classList.add('active');
+        }
+
+        function deleteCurrentNote() {
+            if (!confirm('Yakin ingin menghapus catatan ini?')) return;
+            
+            notes = notes.filter(function(n) { return n.id !== currentNoteId; });
+            saveToStorage();
+            
+            closeModalById('viewNoteModal');
+            renderNotes();
+            populateMonthFilter();
+            showToast('Catatan berhasil dihapus');
+        }
+
+        // ============== EXPORT/IMPORT ==============
+        function exportData() {
+            const data = JSON.stringify({ notes: notes }, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'notebooks_backup_' + new Date().toISOString().split('T')[0] + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('Data berhasil diekspor');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.notes && Array.isArray(data.notes)) {
+                        if (confirm('Ini akan menggabungkan dengan data yang ada. Lanjutkan?')) {
+                            // Merge data, avoid duplicates by id
+                            const existingIds = notes.map(function(n) { return n.id; });
+                            data.notes.forEach(function(n) {
+                                if (existingIds.indexOf(n.id) === -1) {
+                                    notes.push(n);
+                                }
+                            });
+                            saveToStorage();
+                            renderNotes();
+                            populateMonthFilter();
+                            showToast('Data berhasil diimpor');
+                        }
+                    } else {
+                        showToast('Format file tidak valid');
+                    }
+                } catch (e) {
+                    showToast('Gagal membaca file');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ============== SHARE ==============
+        function openShareModal() {
+            document.getElementById('shareCode').textContent = FRIEND_ACCESS_CODE;
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function copyShareCode() {
+            navigator.clipboard.writeText(FRIEND_ACCESS_CODE).then(function() {
+                showToast('Kode berhasil disalin');
+            }).catch(function() {
+                showToast('Kode: ' + FRIEND_ACCESS_CODE);
+            });
+        }
+
+        // ============== MODALS ==============
+        function closeModal(event, modalId) {
+            if (event.target.classList.contains('modal-overlay')) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+        }
+
+        function closeModalById(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // ============== UTILITIES ==============
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function formatDateShort(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('id-ID', { 
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.style.transform = 'translateX(0)';
+            
+            setTimeout(function() {
+                toast.style.transform = 'translateX(150%)';
+            }, 3000);
+        }
+
+        // ============== EVENT LISTENERS ==============
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(function(modal) {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+
+        // ============== INITIALIZATION ==============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            createStarfield();
+            
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showDashboard();
+                } catch (e) {
+                    currentUser = null;
+                }
+            }
+        });
+
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(createStarfield, 200);
+        });
+    </script>
+</body>
+</html>
