@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebooks - Jurnal Pribadi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: rgba(18, 18, 28, 0.85);
+            --fg: #e8e6e3;
+            --muted: #6b6b7b;
+            --accent: #c9a227;
+            --accent-glow: rgba(201, 162, 39, 0.3);
+            --border: rgba(255, 255, 255, 0.08);
+            --star-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Starfield Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: var(--star-color);
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--base-opacity); transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            animation: shoot 3s ease-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(0) translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateX(300px) translateY(300px); opacity: 0; }
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--muted);
+            border-radius: 3px;
+        }
+
+        /* Input Styles */
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: var(--fg);
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .input-field::placeholder {
+            color: var(--muted);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #a68520 100%);
+            color: var(--bg);
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--fg);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Note Card */
+        .note-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--accent);
+            transition: height 0.3s ease;
+        }
+
+        .note-card:hover::before {
+            height: 100%;
+        }
+
+        .note-card:hover {
+            transform: translateY(-4px) translateX(4px);
+            border-color: rgba(201, 162, 39, 0.3);
+            box-shadow: -4px 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: float-particle 15s linear infinite;
+        }
+
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Entrance Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+
+        /* Date Badge */
+        .date-badge {
+            background: rgba(201, 162, 39, 0.15);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Textarea */
+        .journal-textarea {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            color: var(--fg);
+            resize: none;
+            min-height: 200px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            line-height: 1.8;
+            transition: all 0.3s ease;
+        }
+
+        .journal-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* Share Link */
+        .share-link {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        /* Tab Styles */
+        .tab-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: var(--muted);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--fg);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Focus Visible */
+        *:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            padding: 16px 24px;
+            border-radius: 12px;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* Lock Icon Animation */
+        .lock-icon {
+            transition: all 0.3s ease;
+        }
+
+        .lock-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <div id="starfield"></div>
+
+    <!-- Floating Particles -->
+    <div id="particles"></div>
+
+    <!-- Main App -->
+    <div id="app" class="relative z-10 min-h-screen">
+        
+        <!-- Login Screen -->
+        <div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
+            <div class="glass-card p-10 w-full max-w-md fade-in-up">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center gap-3 mb-4">
+                        <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        <h1 class="font-display text-4xl font-bold tracking-tight">Notebooks</h1>
+                    </div>
+                    <p class="text-gray-400 text-sm">Catatan pribadi yang privat dan bermakna</p>
+                </div>
+
+                <div class="flex gap-2 mb-8 p-1 bg-black/30 rounded-xl">
+                    <button class="tab-btn active flex-1" data-tab="owner" onclick="switchTab('owner')">Owner</button>
+                    <button class="tab-btn flex-1" data-tab="guest" onclick="switchTab('guest')">Teman</button>
+                </div>
+
+                <!-- Owner Login -->
+                <div id="ownerForm" class="space-y-5">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Username</label>
+                        <input type="text" id="username" class="input-field" placeholder="Masukkan username">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Password</label>
+                        <input type="password" id="password" class="input-field" placeholder="Masukkan password">
+                    </div>
+                    <button type="button" class="btn-primary w-full mt-6" onclick="handleOwnerLogin()">
+                        Masuk sebagai Owner
+                    </button>
+                    <p id="loginError" class="text-red-400 text-sm text-center hidden">Username atau password salah</p>
+                </div>
+
+                <!-- Guest Access -->
+                <div id="guestForm" class="space-y-5 hidden">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">Kode Akses</label>
+                        <input type="text" id="accessCode" class="input-field" placeholder="Masukkan kode berbagi">
+                    </div>
+                    <button type="button" class="btn-primary w-full mt-6" onclick="handleGuestAccess()">
+                        Akses Catatan
+                    </button>
+                    <p id="guestError" class="text-red-400 text-sm text-center hidden">Kode akses tidak valid</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div id="dashboard" class="hidden">
+            <!-- Header -->
+            <header class="border-b border-white/5 backdrop-blur-xl sticky top-0 z-50 bg-black/20">
+                <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-7 h-7 text-amber-500 lock-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        <h1 class="font-display text-2xl font-semibold">Notebooks</h1>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <span id="userBadge" class="date-badge hidden md:block"></span>
+                        <button id="logoutBtn" class="btn-secondary text-sm" onclick="handleLogout()">
+                            Keluar
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="max-w-6xl mx-auto px-6 py-10">
+                <!-- Welcome Section -->
+                <div class="mb-10 fade-in-up">
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mb-3">
+                        <span id="greeting">Selamat Datang</span>
+                    </h2>
+                    <p class="text-gray-400">Tulis dan simpan momen berharga dalam hidupmu</p>
+                </div>
+
+                <!-- Action Buttons (Owner Only) -->
+                <div id="ownerActions" class="flex flex-wrap gap-4 mb-10 fade-in-up stagger-1">
+                    <button type="button" class="btn-primary flex items-center gap-2" onclick="openNewNoteModal()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tulis Catatan Baru
+                    </button>
+                    <button type="button" class="btn-secondary flex items-center gap-2" onclick="openShareModal()">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
+                        Bagikan dengan Teman
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 fade-in-up stagger-2">
+                    <div class="glass-card p-5 text-center">
+                        <p class="font-display text-3xl font-bold text-amber-500" id="totalNotes">0</p>
+                        <p class="text-gray-400 text-sm">Total Catatan</p>
+                    </div>
+                    <div class="glass-card p-5 text-center">
+                        <p class="font-display text-3xl font-bold text-amber-500" id="thisMonth">0</p>
+                        <p class="text-gray-400 text-sm">Bulan Ini</p>
+                    </div>
+                    <div class="glass-card p-5 text-center">
+                        <p class="font-display text-3xl font-bold text-amber-500" id="sharedCount">0</p>
+                        <p class="text-gray-400 text-sm">Dibagikan</p>
+                    </div>
+                    <div class="glass-card p-5 text-center">
+                        <p class="font-display text-3xl font-bold text-amber-500" id="streak">0</p>
+                        <p class="text-gray-400 text-sm">Hari Berturut</p>
+                    </div>
+                </div>
+
+                <!-- Notes Grid -->
+                <div class="mb-6 flex items-center justify-between fade-in-up stagger-3">
+                    <h3 class="font-display text-xl font-semibold">Catatan Terbaru</h3>
+                    <select id="filterMonth" class="input-field w-auto text-sm py-2 px-4" onchange="filterNotes()">
+                        <option value="all">Semua Waktu</option>
+                    </select>
+                </div>
+
+                <div id="notesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Notes will be rendered here -->
+                </div>
+
+                <div id="emptyState" class="hidden text-center py-20">
+                    <svg class="w-20 h-20 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    <p class="text-gray-400 font-display text-xl">Belum ada catatan</p>
+                    <p class="text-gray-500 text-sm mt-2">Mulai tulis catatan pertamamu</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- New Note Modal -->
+    <div id="newNoteModal" class="modal-overlay" onclick="closeModal(event, 'newNoteModal')">
+        <div class="modal-content glass-card p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-display text-2xl font-semibold">Catatan Baru</h3>
+                <button type="button" onclick="closeModalById('newNoteModal')" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Judul</label>
+                    <input type="text" id="noteTitle" class="input-field" placeholder="Judul catatan...">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Tanggal</label>
+                    <input type="date" id="noteDate" class="input-field">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Isi Catatan</label>
+                    <textarea id="noteContent" class="journal-textarea w-full" placeholder="Tulis ceritamu di sini..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Mood Hari Ini</label>
+                    <div class="flex gap-3 flex-wrap">
+                        <button type="button" class="mood-btn text-2xl p-3 rounded-xl border border-white/10 hover:border-amber-500 transition-all" data-mood="happy" onclick="selectMood('happy')">😊</button>
+                        <button type="button" class="mood-btn text-2xl p-3 rounded-xl border border-white/10 hover:border-amber-500 transition-all" data-mood="calm" onclick="selectMood('calm')">😌</button>
+                        <button type="button" class="mood-btn text-2xl p-3 rounded-xl border border-white/10 hover:border-amber-500 transition-all" data-mood="sad" onclick="selectMood('sad')">😢</button>
+                        <button type="button" class="mood-btn text-2xl p-3 rounded-xl border border-white/10 hover:border-amber-500 transition-all" data-mood="excited" onclick="selectMood('excited')">🤩</button>
+                        <button type="button" class="mood-btn text-2xl p-3 rounded-xl border border-white/10 hover:border-amber-500 transition-all" data-mood="neutral" onclick="selectMood('neutral')">😐</button>
+                    </div>
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button type="button" class="btn-secondary flex-1" onclick="closeModalById('newNoteModal')">Batal</button>
+                    <button type="button" class="btn-primary flex-1" onclick="saveNote()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Note Modal -->
+    <div id="viewNoteModal" class="modal-overlay" onclick="closeModal(event, 'viewNoteModal')">
+        <div class="modal-content glass-card p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <span id="viewDate" class="date-badge"></span>
+                </div>
+                <button type="button" onclick="closeModalById('viewNoteModal')" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <h3 id="viewTitle" class="font-display text-3xl font-bold mb-4"></h3>
+            <div id="viewMood" class="mb-4"></div>
+            <div id="viewContent" class="text-gray-300 leading-relaxed whitespace-pre-wrap"></div>
+            
+            <div id="viewActions" class="flex gap-4 pt-6 mt-6 border-t border-white/10">
+                <button type="button" class="btn-secondary flex-1" onclick="editCurrentNote()">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Edit
+                </button>
+                <button type="button" class="btn-secondary flex-1 text-red-400 hover:border-red-400" onclick="deleteCurrentNote()">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal-overlay" onclick="closeModal(event, 'shareModal')">
+        <div class="modal-content glass-card p-8 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="font-display text-2xl font-semibold">Bagikan dengan Teman</h3>
+                <button type="button" onclick="closeModalById('shareModal')" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <p class="text-gray-400 mb-6">Berikan kode ini kepada teman untuk mengakses catatanmu:</p>
+            
+            <div class="share-link mb-6 text-center text-lg" id="shareCode">himasayang</div>
+            
+            <div class="flex gap-4">
+                <button type="button" class="btn-secondary flex-1" onclick="copyShareCode()">
+                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                    </svg>
+                    Salin Kode
+                </button>
+                <button type="button" class="btn-primary flex-1" onclick="closeModalById('shareModal')">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast">
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span id="toastMessage">Berhasil disimpan</span>
+    </div>
+
+    <script>
+        // ============== KONFIGURASI KREDENSIAL ==============
+        const OWNER_CREDENTIALS = { 
+            username: 'Damar21', 
+            password: 'Damar.21' 
+        };
+        const FRIEND_ACCESS_CODE = 'himasayang';
+        
+        // ============== VARIABEL GLOBAL ==============
+        const STORAGE_KEY = 'notebooks_data';
+        
+        let currentUser = null;
+        let currentNoteId = null;
+        let selectedMood = 'neutral';
+        let notes = [];
+        
+        // ============== INISIALISASI DATA ==============
+        function initializeData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const data = JSON.parse(stored);
+                    notes = data.notes || [];
+                } catch (e) {
+                    notes = [];
+                }
+            }
+            
+            // Jika belum ada data, buat sample notes
+            if (notes.length === 0) {
+                notes = [
+                    {
+                        id: 'note_1',
+                        title: 'Hari Pertama',
+                        content: 'Hari ini cuaca sangat cerah. Aku memutuskan untuk jalan-jalan ke taman kota. Bunga-bunga mulai bermekaran dan udara terasa sangat segar.',
+                        date: '2025-01-15',
+                        mood: 'happy',
+                        createdAt: new Date('2025-01-15').toISOString()
+                    },
+                    {
+                        id: 'note_2',
+                        title: 'Refleksi Malam',
+                        content: 'Malam ini aku banyak berpikir tentang masa depan. Ada kekhawatiran tapi juga harapan. Aku percaya setiap langkah kecil akan membawa pada tujuan besar.',
+                        date: '2025-01-14',
+                        mood: 'calm',
+                        createdAt: new Date('2025-01-14').toISOString()
+                    }
+                ];
+                saveToStorage();
+            }
+        }
+        
+        function saveToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ notes }));
+        }
+
+        // ============== STARFIELD BACKGROUND ==============
+        function createStarfield() {
+            const container = document.getElementById('starfield');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const starCount = window.innerWidth < 768 ? 80 : 150;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 2 + 1;
+                const baseOpacity = Math.random() * 0.5 + 0.3;
+                
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                star.style.setProperty('--delay', (Math.random() * 2) + 's');
+                star.style.setProperty('--base-opacity', baseOpacity);
+                
+                container.appendChild(star);
+            }
+            
+            // Shooting stars
+            for (let i = 0; i < 3; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.left = Math.random() * 50 + '%';
+                shootingStar.style.top = Math.random() * 50 + '%';
+                shootingStar.style.animationDelay = (i * 4 + Math.random() * 2) + 's';
+                container.appendChild(shootingStar);
+            }
+        }
+
+        // ============== FLOATING PARTICLES ==============
+        function createParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = (Math.random() * 15) + 's';
+                particle.style.opacity = Math.random() * 0.5 + 0.2;
+                container.appendChild(particle);
+            }
+        }
+
+        // ============== AUTENTIKASI ==============
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(function(t) {
+                t.classList.remove('active');
+            });
+            document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+            
+            const ownerForm = document.getElementById('ownerForm');
+            const guestForm = document.getElementById('guestForm');
+            
+            if (tab === 'owner') {
+                ownerForm.classList.remove('hidden');
+                guestForm.classList.add('hidden');
+            } else {
+                ownerForm.classList.add('hidden');
+                guestForm.classList.remove('hidden');
+            }
+        }
+
+        function handleOwnerLogin() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorEl = document.getElementById('loginError');
+            
+            if (!usernameInput || !passwordInput) return;
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (username === OWNER_CREDENTIALS.username && password === OWNER_CREDENTIALS.password) {
+                currentUser = { type: 'owner', username: username };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showDashboard();
+                errorEl.classList.add('hidden');
+            } else {
+                errorEl.classList.remove('hidden');
+                passwordInput.value = '';
+            }
+        }
+
+        function handleGuestAccess() {
+            const codeInput = document.getElementById('accessCode');
+            const errorEl = document.getElementById('guestError');
+            
+            if (!codeInput) return;
+            
+            const code = codeInput.value.trim();
+            
+            if (code === FRIEND_ACCESS_CODE) {
+                currentUser = { type: 'guest', username: 'Teman' };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showDashboard();
+                errorEl.classList.add('hidden');
+            } else {
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('accessCode').value = '';
+        }
+
+        // ============== DASHBOARD ==============
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            const userBadge = document.getElementById('userBadge');
+            const ownerActions = document.getElementById('ownerActions');
+            const greeting = document.getElementById('greeting');
+            
+            if (currentUser.type === 'owner') {
+                userBadge.textContent = 'Owner';
+                ownerActions.style.display = 'flex';
+                
+                const hour = new Date().getHours();
+                let timeGreeting = 'Selamat Malam';
+                if (hour >= 5 && hour < 12) timeGreeting = 'Selamat Pagi';
+                else if (hour >= 12 && hour < 15) timeGreeting = 'Selamat Siang';
+                else if (hour >= 15 && hour < 18) timeGreeting = 'Selamat Sore';
+                
+                greeting.textContent = timeGreeting + ', ' + currentUser.username;
+            } else {
+                userBadge.textContent = 'Tamu';
+                ownerActions.style.display = 'none';
+                greeting.textContent = 'Selamat Datang, Teman';
+            }
+            
+            renderNotes();
+            updateStats();
+            populateMonthFilter();
+        }
+
+        function renderNotes(filteredNotes) {
+            const grid = document.getElementById('notesGrid');
+            const emptyState = document.getElementById('emptyState');
+            const notesToRender = filteredNotes || notes;
+            
+            if (notesToRender.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            const sortedNotes = notesToRender.slice().sort(function(a, b) {
+                return new Date(b.date) - new Date(a.date);
+            });
+            
+            let html = '';
+            for (let i = 0; i < sortedNotes.length; i++) {
+                const note = sortedNotes[i];
+                html += '<div class="note-card fade-in-up" style="animation-delay: ' + (i * 0.1) + 's" onclick="viewNote(\'' + note.id + '\')">' +
+                    '<div class="flex items-center justify-between mb-3">' +
+                        '<span class="date-badge">' + formatDate(note.date) + '</span>' +
+                        '<span class="text-xl">' + getMoodEmoji(note.mood) + '</span>' +
+                    '</div>' +
+                    '<h4 class="font-display text-xl font-semibold mb-2 line-clamp-2">' + escapeHtml(note.title) + '</h4>' +
+                    '<p class="text-gray-400 text-sm line-clamp-3">' + escapeHtml(note.content) + '</p>' +
+                '</div>';
+            }
+            
+            grid.innerHTML = html;
+        }
+
+        function updateStats() {
+            document.getElementById('totalNotes').textContent = notes.length;
+            
+            const now = new Date();
+            const thisMonthNotes = notes.filter(function(n) {
+                const noteDate = new Date(n.date);
+                return noteDate.getMonth() === now.getMonth() && noteDate.getFullYear() === now.getFullYear();
+            });
+            document.getElementById('thisMonth').textContent = thisMonthNotes.length;
+            
+            document.getElementById('sharedCount').textContent = currentUser && currentUser.type === 'owner' ? '1' : '0';
+            
+            // Calculate streak
+            const dates = [];
+            notes.forEach(function(n) {
+                if (dates.indexOf(n.date) === -1) {
+                    dates.push(n.date);
+                }
+            });
+            dates.sort().reverse();
+            
+            let streak = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < dates.length; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(checkDate.getDate() - i);
+                const dateStr = checkDate.toISOString().split('T')[0];
+                
+                if (dates.indexOf(dateStr) !== -1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function populateMonthFilter() {
+            const select = document.getElementById('filterMonth');
+            const months = [];
+            
+            notes.forEach(function(n) {
+                const date = new Date(n.date);
+                const monthYear = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+                if (months.indexOf(monthYear) === -1) {
+                    months.push(monthYear);
+                }
+            });
+            
+            months.sort().reverse();
+            
+            let html = '<option value="all">Semua Waktu</option>';
+            for (let i = 0; i < months.length; i++) {
+                const m = months[i];
+                const parts = m.split('-');
+                const year = parts[0];
+                const month = parts[1];
+                const monthDate = new Date(year, month - 1);
+                const monthName = monthDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+                html += '<option value="' + m + '">' + monthName + '</option>';
+            }
+            
+            select.innerHTML = html;
+        }
+
+        function filterNotes() {
+            const value = document.getElementById('filterMonth').value;
+            
+            if (value === 'all') {
+                renderNotes();
+            } else {
+                const filtered = notes.filter(function(n) {
+                    return n.date.indexOf(value) === 0;
+                });
+                renderNotes(filtered);
+            }
+        }
+
+        // ============== NOTES CRUD ==============
+        function openNewNoteModal() {
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+            document.getElementById('noteDate').value = new Date().toISOString().split('T')[0];
+            selectedMood = 'neutral';
+            updateMoodButtons();
+            document.getElementById('newNoteModal').classList.add('active');
+        }
+
+        function selectMood(mood) {
+            selectedMood = mood;
+            updateMoodButtons();
+        }
+
+        function updateMoodButtons() {
+            const buttons = document.querySelectorAll('.mood-btn');
+            buttons.forEach(function(btn) {
+                btn.classList.remove('border-amber-500', 'bg-amber-500/20');
+                if (btn.dataset.mood === selectedMood) {
+                    btn.classList.add('border-amber-500', 'bg-amber-500/20');
+                }
+            });
+        }
+
+        function saveNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            const date = document.getElementById('noteDate').value;
+            
+            if (!title || !content || !date) {
+                showToast('Mohon lengkapi semua field');
+                return;
+            }
+            
+            const note = {
+                id: 'note_' + Date.now(),
+                title: title,
+                content: content,
+                date: date,
+                mood: selectedMood,
+                createdAt: new Date().toISOString()
+            };
+            
+            notes.push(note);
+            saveToStorage();
+            
+            closeModalById('newNoteModal');
+            renderNotes();
+            updateStats();
+            populateMonthFilter();
+            showToast('Catatan berhasil disimpan');
+        }
+
+        function viewNote(id) {
+            const note = notes.find(function(n) { return n.id === id; });
+            if (!note) return;
+            
+            currentNoteId = id;
+            
+            document.getElementById('viewTitle').textContent = note.title;
+            document.getElementById('viewDate').textContent = formatDate(note.date);
+            document.getElementById('viewContent').textContent = note.content;
+            document.getElementById('viewMood').innerHTML = '<span class="text-2xl">' + getMoodEmoji(note.mood) + '</span>';
+            
+            const viewActions = document.getElementById('viewActions');
+            viewActions.style.display = currentUser && currentUser.type === 'owner' ? 'flex' : 'none';
+            
+            document.getElementById('viewNoteModal').classList.add('active');
+        }
+
+        function editCurrentNote() {
+            const note = notes.find(function(n) { return n.id === currentNoteId; });
+            if (!note) return;
+            
+            closeModalById('viewNoteModal');
+            
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            document.getElementById('noteDate').value = note.date;
+            selectedMood = note.mood;
+            updateMoodButtons();
+            
+            // Remove old note
+            notes = notes.filter(function(n) { return n.id !== currentNoteId; });
+            
+            document.getElementById('newNoteModal').classList.add('active');
+        }
+
+        function deleteCurrentNote() {
+            if (!confirm('Yakin ingin menghapus catatan ini?')) return;
+            
+            notes = notes.filter(function(n) { return n.id !== currentNoteId; });
+            saveToStorage();
+            
+            closeModalById('viewNoteModal');
+            renderNotes();
+            updateStats();
+            populateMonthFilter();
+            showToast('Catatan berhasil dihapus');
+        }
+
+        // ============== SHARE ==============
+        function openShareModal() {
+            document.getElementById('shareCode').textContent = FRIEND_ACCESS_CODE;
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function copyShareCode() {
+            const code = document.getElementById('shareCode').textContent;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(function() {
+                    showToast('Kode berhasil disalin');
+                });
+            } else {
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Kode berhasil disalin');
+            }
+        }
+
+        // ============== MODALS ==============
+        function closeModal(event, modalId) {
+            if (event.target.classList.contains('modal-overlay')) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+        }
+
+        function closeModalById(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // ============== UTILITIES ==============
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('id-ID', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function getMoodEmoji(mood) {
+            const moods = {
+                happy: '😊',
+                calm: '😌',
+                sad: '😢',
+                excited: '🤩',
+                neutral: '😐'
+            };
+            return moods[mood] || '😐';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ============== KEYBOARD NAVIGATION ==============
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal-overlay.active');
+                modals.forEach(function(modal) {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+
+        // ============== INITIALIZATION ==============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            createStarfield();
+            createParticles();
+            
+            // Check for existing session
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showDashboard();
+                } catch (e) {
+                    currentUser = null;
+                }
+            }
+        });
+
+        // Resize handler
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(createStarfield, 200);
+        });
+    </script>
+</body>
+</html>
